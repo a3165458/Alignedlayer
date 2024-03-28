@@ -58,7 +58,7 @@ go version
 # 克隆项目仓库
 cd $HOME
 rm -rf $HOME/aligned_layer_tendermint
-git clone --depth 1 --branch v0.0.2 https://github.com/yetanotherco/aligned_layer_tendermint
+git clone --depth 1 --branch v0.1.0 https://github.com/yetanotherco/aligned_layer_tendermint
 cd $HOME/aligned_layer_tendermint/cmd/alignedlayerd 
 go build 
 chmod +x alignedlayerd
