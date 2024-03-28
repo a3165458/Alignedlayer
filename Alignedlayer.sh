@@ -99,6 +99,7 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
+cd $HOME
 sudo systemctl daemon-reload
 sudo systemctl enable alignedlayerd
 sudo systemctl restart alignedlayerd
