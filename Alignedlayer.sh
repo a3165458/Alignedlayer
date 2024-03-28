@@ -168,7 +168,7 @@ function view_logs() {
 
 # 卸载节点功能
 function uninstall_node() {
-    echo "你确定要卸载Babylon 节点程序吗？这将会删除所有相关的数据。[Y/N]"
+    echo "你确定要卸载Alignedlayer 节点程序吗？这将会删除所有相关的数据。[Y/N]"
     read -r -p "请确认: " response
 
     case "$response" in
