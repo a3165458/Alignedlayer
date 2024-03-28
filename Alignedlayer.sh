@@ -116,27 +116,10 @@ function add_wallet() {
 
 # 创建验证者
 function add_validator() {
-    pubkey=$(alignedlayerd comet show-validator)
-    read -p "请输入您的钱包名称: " wallet_name
-    read -p "请输入您想设置的验证者的名字: " validator_name
-    read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
-    sudo tee ~/validator.json > /dev/null <<EOF
-{
-  "pubkey": ${PUBKEY},
-  "amount": "1000000stake",
-  "moniker": "$validator_name",
-  "details": "$details",
-  "commission-rate": "0.1",
-  "commission-max-rate": "0.2",
-  "commission-max-change-rate": "0.01",
-  "min-self-delegation": "1"
-}
+cd $HOME
+cd aligned_layer_tendermint
 
-EOF
-wardend tx staking create-validator validator.json --from $wallet_name  \
---chain-id=alignedlayer \
---fees=50stake
---from=$wallet_name
+bash setup_validator.sh wallet 1050000stake
 }
 
 # 导入钱包
