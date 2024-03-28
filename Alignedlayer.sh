@@ -38,13 +38,17 @@ function check_and_set_alias() {
 # 节点安装功能
 function install_node() {
 
+#!/bin/bash
+
+# 清屏
+clear
+
 # 创建节点名称
 read -p "输入节点名称,别搞奇形怪状的符号，纯英文就行: " MONIKER
 
+# 更新和安装依赖
 sudo apt update && sudo apt upgrade -y
-
-# 安装构建工具
-sudo apt -qy install curl git jq lz4 build-essential
+sudo apt install curl git jq lz4 build-essential -y
 
 # 安装 Go
 rm -rf $HOME/go
@@ -54,35 +58,26 @@ echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
 source $HOME/.bash_profile
 go version
 
-
-# 克隆项目仓库
+# 下载并安装 Aligned Layer 二进制文件
 cd $HOME
-rm -rf $HOME/aligned_layer_tendermint
-git clone --depth 1 --branch v0.1.0 https://github.com/yetanotherco/aligned_layer_tendermint
-cd $HOME/aligned_layer_tendermint/cmd/alignedlayerd 
-go build 
+wget https://github.com/yetanotherco/aligned_layer_tendermint/releases/download/v0.1.0/alignedlayerd
 chmod +x alignedlayerd
 sudo mv alignedlayerd /usr/local/bin/
 
-
-# 配置节点
+# 配置节点和创世文件
 alignedlayerd init $MONIKER --chain-id alignedlayer
 
+# 从指定的 URL 安装创世文件
+wget -O $HOME/.alignedlayer/config/genesis.json https://snap.nodex.one/alignedlayer-testnet/genesis.json
 
-# 安装创世文件
-curl -Ls https://snap.nodex.one/alignedlayer-testnet/genesis.json > $HOME/.alignedlayer/config/genesis.json
-curl -Ls https://snap.nodex.one/alignedlayer-testnet/addrbook.json > $HOME/.alignedlayer/config/addrbook.json 
+# 设置种子节点和最小 gas 价格
+SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
+PERSISTENT_PEERS="a1a98d9caf27c3363fab07a8e57ee0927d8c7eec@128.140.3.188:26656,1beca410dba8907a61552554b242b4200788201c@91.107.239.79:26656,f9000461b5f535f0c13a543898cc7ac1cd10f945@88.99.174.203:26656,ca2f644f3f47521ff8245f7a5183e9bbb762c09d@116.203.81.174:26656,dc2011a64fc5f888a3e575f84ecb680194307b56@148.251.235.130:20656,2f6456f1f2298def67dfccd9067e9b019798ba4d@62.171.130.196:24256"
+MINIMUM_GAS_PRICES="0.0001stake"
 
-# 设置种子节点和gas
-sed -i -e "s|^seeds *=.*|seeds = \"d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210\"|" $HOME/.alignedlayer/config/config.toml
-sed -i -e 's|^persistent_peers *=.*|persistent_peers = "a1a98d9caf27c3363fab07a8e57ee0927d8c7eec@128.140.3.188:26656,1beca410dba8907a61552554b242b4200788201c@91.107.239.79:26656,f9000461b5f535f0c13a543898cc7ac1cd10f945@88.99.174.203:26656,ca2f644f3f47521ff8245f7a5183e9bbb762c09d@116.203.81.174:26656,dc2011a64fc5f888a3e575f84ecb680194307b56@148.251.235.130:20656,2f6456f1f2298def67dfccd9067e9b019798ba4d@62.171.130.196:24256"|' $HOME/.alignedlayer/config/config.toml
-sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"0.0001stake\"|" $HOME/.alignedlayer/config/app.toml
-
-
-
-# 下载快照
-curl -L https://snap.nodex.one/alignedlayer-testnet/alignedlayer-latest.tar.lz4 | tar -Ilz4 -xf - -C $HOME/.alignedlayer
-
+sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.alignedlayer/config/config.toml
+sed -i -e "s|^persistent_peers *=.*|persistent_peers = \"$PERSISTENT_PEERS\"|" $HOME/.alignedlayer/config/config.toml
+sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES\"|" $HOME/.alignedlayer/config/app.toml
 
 # 设置启动服务
 sudo tee /etc/systemd/system/alignedlayerd.service > /dev/null <<EOF
@@ -90,7 +85,7 @@ sudo tee /etc/systemd/system/alignedlayerd.service > /dev/null <<EOF
 Description=alignedlayerd
 After=network-online.target
 [Service]
-User=root
+User=$USER
 ExecStart=$(which alignedlayerd) start
 Restart=always
 RestartSec=3
@@ -99,12 +94,12 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
-cd $HOME
 sudo systemctl daemon-reload
 sudo systemctl enable alignedlayerd
-sudo systemctl restart alignedlayerd
+sudo systemctl start alignedlayerd
 
-echo '====================== 安装完成 ==========================='
+
+echo "====================== 安装完成 ==========================="
     
 }
 
@@ -157,7 +152,7 @@ function uninstall_node() {
     case "$response" in
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
-            sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sudo rm /etc/systemd/system/alignedlayerd.service && sudo systemctl daemon-reload && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd)
+sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sudo rm /etc/systemd/system/alignedlayerd.service && sudo systemctl daemon-reload && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
 
             echo "节点程序卸载完成。"
             ;;
