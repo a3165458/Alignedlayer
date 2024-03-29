@@ -121,8 +121,7 @@ cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanot
 
 # 导入钱包
 function import_wallet() {
-    read -p "请输入钱包名称: " wallet_name
-    alignedlayerd keys add "$wallet_name" --recover
+    alignedlayerd keys add wallet --recover
 }
 
 # 查询余额
