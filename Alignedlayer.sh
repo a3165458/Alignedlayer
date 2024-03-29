@@ -110,6 +110,9 @@ echo "====================== 安装完成 ==========================="
 # 创建钱包
 function add_wallet() {
     alignedlayerd keys add wallet
+
+
+    
 }
 
 # 创建验证者
@@ -117,32 +120,44 @@ function add_validator() {
 cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake
 
 
+
 }
 
 # 导入钱包
 function import_wallet() {
     alignedlayerd keys add wallet --recover
+
+
+    
 }
 
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
     alignedlayerd query bank balances "$wallet_address" 
+
+    
 }
 
 # 查看节点同步状态
 function check_sync_status() {
     alignedlayerd status | jq .sync_info
+
+    
 }
 
 # 查看Alignedlayer 服务状态
 function check_service_status() {
     systemctl status alignedlayerd
+
+    
 }
 
 # 节点日志查询
 function view_logs() {
     sudo journalctl -f -u alignedlayerd.service 
+
+    
 }
 
 # 卸载节点功能
