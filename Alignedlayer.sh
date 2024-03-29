@@ -162,11 +162,6 @@ sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sud
     esac
 }
 
-function reward_test() {
-echo "请进入网站:https://faucet.alignedlayer.com 领取测试代币"
-
-}
-
 
 # 主菜单
 function main_menu() {
@@ -188,7 +183,6 @@ function main_menu() {
     echo "8. 运行日志查询"
     echo "9. 卸载脚本"
     echo "10. 设置快捷键"  
-    echo "11. 领水"  
     read -p "请输入选项（1-11）: " OPTION
 
     case $OPTION in
@@ -202,7 +196,6 @@ function main_menu() {
     8) view_logs ;;
     9) uninstall_node ;;
     10) check_and_set_alias ;;  
-    11) reward_test ;;  
     *) echo "无效选项。" ;;
     esac
     echo "按任意键返回主菜单..."
