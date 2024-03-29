@@ -70,7 +70,7 @@ wget -O $HOME/.alignedlayer/config/addrbook.json https://raw.githubusercontent.c
 
 # 设置种子节点和最小 gas 价格
 SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
-PERSISTENT_PEERS="125b4260951111e1d7111c071011aec6d24f2087@148.251.82.6:26656"
+PERSISTENT_PEERS="125b4260951111e1d7111c071011aec6d24f2087@148.251.82.6:26656,74af08a0cf53d78e3a071c944b355cae95c1c1ef@37.60.243.112:26656"
 MINIMUM_GAS_PRICES="0.0001stake"
 
 
