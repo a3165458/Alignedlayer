@@ -108,8 +108,8 @@ function add_wallet() {
 
 # 创建验证者
 function add_validator() {
-cd $HOME
-cd aligned_layer_tendermint
+cd $HOME && wget https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh
+chmod +x setup_validator.sh
 
 bash setup_validator.sh wallet 1050000stake
 }
