@@ -66,6 +66,7 @@ alignedlayerd init $MONIKER --chain-id alignedlayer
 
 # 从指定的 URL 安装创世文件
 wget -O $HOME/.alignedlayer/config/genesis.json https://snap.nodex.one/alignedlayer-testnet/genesis.json
+wget -O $HOME/.alignedlayer/config/addrbook.json https://raw.githubusercontent.com/a3165458/Alignedlayer/main/addrbook.json
 
 # 设置种子节点和最小 gas 价格
 SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
