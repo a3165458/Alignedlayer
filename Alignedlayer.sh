@@ -38,8 +38,7 @@ function install_pm2() {
     fi
 }
 
-install_nodejs_and_npm
-install_pm2
+
 
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
@@ -71,6 +70,9 @@ function check_and_set_alias() {
 
 # 节点安装功能
 function install_node() {
+
+install_nodejs_and_npm
+install_pm2
 
 # 创建节点名称
 read -p "输入节点名称,别搞奇形怪状的符号，纯英文就行: " MONIKER
