@@ -7,6 +7,43 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+# 检查并安装 Node.js、npm 和 PM2
+function check_and_install_dependencies() {
+    if ! command -v node >/dev/null 2>&1; then
+        echo "Node.js 未安装，正在安装..."
+        curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        echo "Node.js 安装完成。"
+    else
+        echo "Node.js 已安装。"
+    fi
+
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "npm 未安装，正在安装..."
+        sudo apt-get install -y npm
+        echo "npm 安装完成。"
+    else
+        echo "npm 已安装。"
+    fi
+
+    if ! command -v pm2 >/dev/null 2>&1; then
+        echo "PM2 未安装，正在安装..."
+        npm install -g pm2
+        echo "PM2 安装完成。"
+    else
+        echo "PM2 已安装。"
+    fi
+}
+
+# 检查是否以root用户运行脚本
+if [ "$(id -u)" != "0" ]; then
+    echo "此脚本需要以root用户权限运行。"
+    echo "请尝试使用 'sudo -i' 命令切换到root用户，然后再次运行此脚本。"
+    exit 1
+fi
+
+check_and_install_dependencies
+
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
 
@@ -78,29 +115,18 @@ sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.alignedlayer/config/config.
 sed -i -e "s|^persistent_peers *=.*|persistent_peers = \"$PERSISTENT_PEERS\"|" $HOME/.alignedlayer/config/config.toml
 sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES\"|" $HOME/.alignedlayer/config/app.toml
 
-# 设置启动服务
-sudo tee /etc/systemd/system/alignedlayerd.service > /dev/null <<EOF
-[Unit]
-Description=alignedlayerd
-After=network-online.target
-[Service]
-User=$USER
-ExecStart=$(which alignedlayerd) start
-Restart=always
-RestartSec=3
-LimitNOFILE=65535
-[Install]
-WantedBy=multi-user.target
-EOF
+# 使用 PM2 启动 alignedlayerd
+    pm2 start /usr/local/bin/alignedlayerd --name alignedlayer-node -- start --watch
+    pm2 save
+    pm2 startup
+    
+    echo "Alignedlayer 节点安装和启动完成。"
+}
 
 # 下载快照
 
 wget $(curl -s https://services.staketab.org/backend/aligned-testnet/ | jq -r .snap_link)
 tar -xf $(curl -s https://services.staketab.org/backend/aligned-testnet/ | jq -r .snap_filename) -C $HOME/.alignedlayer/data/
-
-sudo systemctl daemon-reload
-sudo systemctl enable alignedlayerd
-sudo systemctl start alignedlayerd
 
 
 echo "====================== 安装完成 ==========================="
@@ -110,9 +136,7 @@ echo "====================== 安装完成 ==========================="
 # 创建钱包
 function add_wallet() {
     alignedlayerd keys add wallet
-
-
-    
+   
 }
 
 # 创建验证者
@@ -160,17 +184,16 @@ function view_logs() {
     
 }
 
-# 卸载节点功能
 function uninstall_node() {
-    echo "你确定要卸载Alignedlayer 节点程序吗？这将会删除所有相关的数据。[Y/N]"
+    echo "你确定要卸载 Alignedlayer 节点程序吗？这将会删除所有相关的数据。[Y/N]"
     read -r -p "请确认: " response
 
     case "$response" in
-        [yY][eE][sS]|[yY]) 
+        [yY][eE][sS]|[yY])
             echo "开始卸载节点程序..."
-sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sudo rm /etc/systemd/system/alignedlayerd.service && sudo systemctl daemon-reload && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
-
-            echo "节点程序卸载完成。"
+            pm2 stop alignedlayer-node && pm2 delete alignedlayer-node
+            rm -rf $HOME/.alignedlayerd && rm -rf $HOME/aligned_layer_tendermint && sudo rm -rf $(which alignedlayerd)
+            echo "Alignedlayer 节点程序卸载完成。"
             ;;
         *)
             echo "取消卸载操作。"
