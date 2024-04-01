@@ -140,8 +140,6 @@ cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanot
 # 导入钱包
 function import_wallet() {
     alignedlayerd keys add wallet --recover
-
-
     
 }
 
@@ -155,7 +153,7 @@ function check_balances() {
 
 # 查看节点同步状态
 function check_sync_status() {
-    alignedlayerd status 2>&1 | jq .SyncInfo
+    alignedlayerd status 2>&1 | jq .sync_info
 }
 
 # 查看Alignedlayer 服务状态
