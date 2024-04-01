@@ -116,9 +116,7 @@ sed -i -e "s|^persistent_peers *=.*|persistent_peers = \"$PERSISTENT_PEERS\"|" $
 sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES\"|" $HOME/.alignedlayer/config/app.toml
 
 # 使用 PM2 启动 alignedlayerd
-    pm2 start /usr/local/bin/alignedlayerd --name alignedlayer-node -- start --watch
-    pm2 save
-    pm2 startup
+pm2 start alignedlayerd -- start && pm2 save && pm2 startup
     
     echo "Alignedlayer 节点安装和启动完成。"
 }
