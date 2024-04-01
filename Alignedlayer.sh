@@ -72,8 +72,6 @@ function check_and_set_alias() {
 # 节点安装功能
 function install_node() {
 
-#!/bin/bash
-
 # 创建节点名称
 read -p "输入节点名称,别搞奇形怪状的符号，纯英文就行: " MONIKER
 
