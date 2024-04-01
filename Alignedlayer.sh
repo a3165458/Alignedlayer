@@ -160,24 +160,19 @@ function check_balances() {
 
 # 查看节点同步状态
 function check_sync_status() {
-    alignedlayerd status | jq .sync_info
-
-    
+    alignedlayerd status 2>&1 | jq .SyncInfo
 }
 
 # 查看Alignedlayer 服务状态
 function check_service_status() {
-    systemctl status alignedlayerd
-
-    
+    pm2 status
 }
 
 # 节点日志查询
 function view_logs() {
-    sudo journalctl -f -u alignedlayerd.service 
-
-    
+    pm2 logs artela-node
 }
+    
 
 function uninstall_node() {
     echo "你确定要卸载 Alignedlayer 节点程序吗？这将会删除所有相关的数据。[Y/N]"
