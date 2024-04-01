@@ -7,42 +7,39 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-# 检查并安装 Node.js、npm 和 PM2
-function check_and_install_dependencies() {
-    if ! command -v node >/dev/null 2>&1; then
+# 检查并安装 Node.js 和 npm
+function install_nodejs_and_npm() {
+    if ! command -v node > /dev/null 2>&1; then
         echo "Node.js 未安装，正在安装..."
-        curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
         sudo apt-get install -y nodejs
         echo "Node.js 安装完成。"
     else
         echo "Node.js 已安装。"
     fi
 
-    if ! command -v npm >/dev/null 2>&1; then
+    if ! command -v npm > /dev/null 2>&1; then
         echo "npm 未安装，正在安装..."
         sudo apt-get install -y npm
         echo "npm 安装完成。"
     else
         echo "npm 已安装。"
     fi
+}
 
-    if ! command -v pm2 >/dev/null 2>&1; then
+# 检查并安装 PM2
+function install_pm2() {
+    if ! command -v pm2 > /dev/null 2>&1; then
         echo "PM2 未安装，正在安装..."
-        npm install -g pm2
+        npm install pm2@latest -g
         echo "PM2 安装完成。"
     else
         echo "PM2 已安装。"
     fi
 }
 
-# 检查是否以root用户运行脚本
-if [ "$(id -u)" != "0" ]; then
-    echo "此脚本需要以root用户权限运行。"
-    echo "请尝试使用 'sudo -i' 命令切换到root用户，然后再次运行此脚本。"
-    exit 1
-fi
-
-check_and_install_dependencies
+install_nodejs_and_npm
+install_pm2
 
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
