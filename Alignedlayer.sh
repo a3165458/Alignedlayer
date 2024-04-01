@@ -7,38 +7,34 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+
 # 检查并安装 Node.js 和 npm
 function install_nodejs_and_npm() {
-    if ! command -v node > /dev/null 2>&1; then
-        echo "Node.js 未安装，正在安装..."
-        curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-        echo "Node.js 安装完成。"
+    if command -v node > /dev/null 2>&1; then
+        echo "Node.js 已安装"
     else
-        echo "Node.js 已安装。"
+        echo "Node.js 未安装，正在安装..."
+        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo apt-get install -y nodejs
     fi
 
-    if ! command -v npm > /dev/null 2>&1; then
+    if command -v npm > /dev/null 2>&1; then
+        echo "npm 已安装"
+    else
         echo "npm 未安装，正在安装..."
         sudo apt-get install -y npm
-        echo "npm 安装完成。"
-    else
-        echo "npm 已安装。"
     fi
 }
 
 # 检查并安装 PM2
 function install_pm2() {
-    if ! command -v pm2 > /dev/null 2>&1; then
+    if command -v pm2 > /dev/null 2>&1; then
+        echo "PM2 已安装"
+    else
         echo "PM2 未安装，正在安装..."
         npm install pm2@latest -g
-        echo "PM2 安装完成。"
-    else
-        echo "PM2 已安装。"
     fi
 }
-
-
 
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
@@ -116,7 +112,7 @@ sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES
 pm2 start alignedlayerd -- start && pm2 save && pm2 startup
     
     echo "Alignedlayer 节点安装和启动完成。"
-}
+
 
 # 下载快照
 
@@ -125,8 +121,9 @@ tar -xf $(curl -s https://services.staketab.org/backend/aligned-testnet/ | jq -r
 
 
 echo "====================== 安装完成 ==========================="
-    
+
 }
+
 
 # 创建钱包
 function add_wallet() {
@@ -137,8 +134,6 @@ function add_wallet() {
 # 创建验证者
 function add_validator() {
 cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake
-
-
 
 }
 
