@@ -178,6 +178,15 @@ sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sud
     esac
 }
 
+# 给自己地址验证者质押
+function delegate_self_validator() {
+read -p "请输入质押代币数量: " math
+read -p "请输入钱包名称: " wallet_name
+alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake \
+--from $wallet_name --chain-id alignedlayer \
+--fees 50stake
+
+}
 
 # 主菜单
 function main_menu() {
