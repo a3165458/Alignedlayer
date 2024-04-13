@@ -208,6 +208,7 @@ function main_menu() {
     echo "8. 运行日志查询"
     echo "9. 卸载脚本"
     echo "10. 设置快捷键"  
+    echo "11. 自我质押"  
     read -p "请输入选项（1-11）: " OPTION
 
     case $OPTION in
@@ -221,6 +222,7 @@ function main_menu() {
     8) view_logs ;;
     9) uninstall_node ;;
     10) check_and_set_alias ;;  
+    11) delegate_self_validator ;;  
     *) echo "无效选项。" ;;
     esac
     echo "按任意键返回主菜单..."
