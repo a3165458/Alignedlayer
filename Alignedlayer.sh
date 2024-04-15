@@ -95,8 +95,8 @@ EOF
 
 # 下载快照
 
-wget $(curl -s https://services.staketab.org/backend/aligned-testnet/ | jq -r .snap_link)
-tar -xf $(curl -s https://services.staketab.org/backend/aligned-testnet/ | jq -r .snap_filename) -C $HOME/.alignedlayer/data/
+curl -L http://95.111.243.106/alignedlayer_snapshot_latest.tar.lz4 | tar -I lz4 -xf - -C $HOME/.alignedlayer/data
+mv $HOME/.alignedlayer/priv_validator_state.json.backup $HOME/.alignedlayer/data/priv_validator_state.json
 
 sudo systemctl daemon-reload
 sudo systemctl enable alignedlayerd
