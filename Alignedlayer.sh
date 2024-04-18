@@ -7,6 +7,34 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
+# 检查并安装 Node.js 和 npm
+function install_nodejs_and_npm() {
+    if command -v node > /dev/null 2>&1; then
+        echo "Node.js 已安装"
+    else
+        echo "Node.js 未安装，正在安装..."
+        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    fi
+
+    if command -v npm > /dev/null 2>&1; then
+        echo "npm 已安装"
+    else
+        echo "npm 未安装，正在安装..."
+        sudo apt-get install -y npm
+    fi
+}
+
+# 检查并安装 PM2
+function install_pm2() {
+    if command -v pm2 > /dev/null 2>&1; then
+        echo "PM2 已安装"
+    else
+        echo "PM2 未安装，正在安装..."
+        npm install pm2@latest -g
+    fi
+}
+
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
 
@@ -37,8 +65,9 @@ function check_and_set_alias() {
 
 # 节点安装功能
 function install_node() {
-
-#!/bin/bash
+node_address="http://localhost:5457"
+install_nodejs_and_npm
+install_pm2
 
 # 创建节点名称
 read -p "输入节点名称,别搞奇形怪状的符号，纯英文就行: " MONIKER
@@ -50,9 +79,10 @@ sudo apt install curl git jq lz4 build-essential -y
 # 安装 Go
 rm -rf $HOME/go
 sudo rm -rf /usr/local/go
-curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
+curl -L https://go.dev/dl/go1.21.3.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
 echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
-source $HOME/.bash_profile
+export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+source $HOME/.bash_profile 
 go version
 
 # 下载并安装 Aligned Layer 二进制文件
@@ -65,42 +95,29 @@ sudo mv alignedlayerd /usr/local/bin/
 alignedlayerd init $MONIKER --chain-id alignedlayer
 
 # 从指定的 URL 安装创世文件
-wget -O $HOME/.alignedlayer/config/genesis.json https://snap.nodex.one/alignedlayer-testnet/genesis.json
-wget -O $HOME/.alignedlayer/config/addrbook.json https://raw.githubusercontent.com/a3165458/Alignedlayer/main/addrbook.json
+wget -O $HOME/.alignedlayer/config/genesis.json https://services.staketab.org/aligned-testnet/genesis.json
 
 # 设置种子节点和最小 gas 价格
 SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
 PERSISTENT_PEERS="125b4260951111e1d7111c071011aec6d24f2087@148.251.82.6:26656,74af08a0cf53d78e3a071c944b355cae95c1c1ef@37.60.243.112:26656,797d6ad9a64abd63b785ce81c75ee7397a590786@213.199.62.101:26656,33a338aef4f9e887571fe7e2baf9dd5baa43e9a2@47.236.180.181:26656,0468a823477832e2dd17c94834ac639ac1929860@213.199.39.156:26656"
 MINIMUM_GAS_PRICES="0.0001stake"
 
-
 sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.alignedlayer/config/config.toml
 sed -i -e "s|^persistent_peers *=.*|persistent_peers = \"$PERSISTENT_PEERS\"|" $HOME/.alignedlayer/config/config.toml
 sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES\"|" $HOME/.alignedlayer/config/app.toml
 
-# 设置启动服务
-sudo tee /etc/systemd/system/alignedlayerd.service > /dev/null <<EOF
-[Unit]
-Description=alignedlayerd
-After=network-online.target
-[Service]
-User=$USER
-ExecStart=$(which alignedlayerd) start
-Restart=always
-RestartSec=3
-LimitNOFILE=65535
-[Install]
-WantedBy=multi-user.target
-EOF
+# 配置端口
+sed -i -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:5458\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:5457\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:5460\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:5456\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":5466\"%" $HOME/.alignedlayer/config/config.toml
+sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:5417\"%; s%^address = \":8080\"%address = \":5480\"%; s%^address = \"localhost:9090\"%address = \"0.0.0.0:5490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:5491\"%; s%:8545%:5445%; s%:8546%:5446%; s%:6065%:5465%" $HOME/.alignedlayer/config/app.toml
+echo "export Alignedlayer_RPC_PORT=$node_address" >> $HOME/.bash_profile
+source $HOME/.bash_profile   
 
-# 下载快照
+go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
 
 curl -L http://95.111.243.106/alignedlayer_snapshot_latest.tar.lz4 | tar -I lz4 -xf - -C $HOME/.alignedlayer/data
 mv $HOME/.alignedlayer/priv_validator_state.json.backup $HOME/.alignedlayer/data/priv_validator_state.json
 
-sudo systemctl daemon-reload
-sudo systemctl enable alignedlayerd
-sudo systemctl start alignedlayerd
+pm2 start alignedlayerd -- start && pm2 save && pm2 startup
 
 
 echo "====================== 安装完成 ==========================="
@@ -110,15 +127,12 @@ echo "====================== 安装完成 ==========================="
 # 创建钱包
 function add_wallet() {
     alignedlayerd keys add wallet
-
-
     
 }
 
 # 创建验证者
 function add_validator() {
 cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake
-
 
 
 }
@@ -134,28 +148,26 @@ function import_wallet() {
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    alignedlayerd query bank balances "$wallet_address" 
-
+    alignedlayerd query bank balances "$wallet_address" --node $Alignedlayer_RPC_PORT
     
 }
 
 # 查看节点同步状态
 function check_sync_status() {
-    alignedlayerd status | jq .sync_info
+    alignedlayerd status --node $Alignedlayer_RPC_PORT | jq .sync_info
 
     
 }
 
 # 查看Alignedlayer 服务状态
 function check_service_status() {
-    systemctl status alignedlayerd
-
+    pm2 status alignedlayerd
     
 }
 
 # 节点日志查询
 function view_logs() {
-    sudo journalctl -f -u alignedlayerd.service 
+    pm2 logs alignedlayerd
 
     
 }
@@ -168,7 +180,7 @@ function uninstall_node() {
     case "$response" in
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
-sudo systemctl stop alignedlayerd && sudo systemctl disable alignedlayerd && sudo rm /etc/systemd/system/alignedlayerd.service && sudo systemctl daemon-reload && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
+pm2 stop alignedlayerd && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
 
             echo "节点程序卸载完成。"
             ;;
@@ -185,7 +197,7 @@ read -p "请输入钱包名称: " wallet_name
 alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake \
 --from $wallet_name --chain-id alignedlayer \
 --fees 50stake
-
+--node $Alignedlayer_RPC_PORT
 }
 
 # 主菜单
