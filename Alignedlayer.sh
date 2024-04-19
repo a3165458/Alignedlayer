@@ -132,7 +132,7 @@ function add_wallet() {
 
 # 创建验证者
 function add_validator() {
-cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake
+cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake --node $Alignedlayer_RPC_PORT
 
 
 }
@@ -194,10 +194,10 @@ pm2 stop alignedlayerd && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && 
 function delegate_self_validator() {
 read -p "请输入质押代币数量: " math
 read -p "请输入钱包名称: " wallet_name
-alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake \
+alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake --node $Alignedlayer_RPC_PORT \
 --from $wallet_name --chain-id alignedlayer \
 --fees 50stake
---node $Alignedlayer_RPC_PORT
+
 }
 
 # 主菜单
