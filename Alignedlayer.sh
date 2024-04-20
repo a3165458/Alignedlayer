@@ -192,7 +192,7 @@ function uninstall_node() {
     case "$response" in
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
-pm2 stop alignedlayerd && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
+            pm2 delete alignedlayerd && rm -rf $HOME/.alignedlayerd && rm -rf alignedlayer && sudo rm -rf $(which alignedlayerd) && rm -rf aligned_layer_tendermint && rm -rf .alignedlayer
 
             echo "节点程序卸载完成。"
             ;;
