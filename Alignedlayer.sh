@@ -35,6 +35,17 @@ function install_pm2() {
     fi
 }
 
+# 检查Go环境
+function check_go_installation() {
+    if command -v go > /dev/null 2>&1; then
+        echo "Go 环境已安装"
+        return 0 
+    else
+        echo "Go 环境未安装，正在安装..."
+        return 1 
+    fi
+}
+
 # 脚本保存路径
 SCRIPT_PATH="$HOME/Alignedlayer.sh"
 
@@ -77,12 +88,13 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install curl git jq lz4 build-essential -y
 
 # 安装 Go
-sudo rm -rf /usr/local/go
-curl -L https://go.dev/dl/go1.21.3.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
-echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
-export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
-source $HOME/.bash_profile 
-go version
+if ! check_go_installation; then
+        sudo rm -rf /usr/local/go
+        curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
+        echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
+        source $HOME/.bash_profile
+        go version
+fi
 
 # 下载并安装 Aligned Layer 二进制文件
 cd $HOME
