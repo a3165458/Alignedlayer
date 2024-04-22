@@ -149,6 +149,7 @@ function add_wallet() {
 # 创建验证者
 function add_validator() {
   read -p "请输入你的验证者名称: " validator_name
+  read -p "请输入你的钱包名称: " wallet
   sudo tee ~/validator.json > /dev/null <<EOF
 {
   "pubkey": "$(alignedlayerd comet show-validator)",
@@ -162,7 +163,7 @@ function add_validator() {
 }
 EOF
 alignedlayerd tx staking create-validator $HOME/validator.json \
---from wallet --chain-id alignedlayer \
+--from $wallet --chain-id alignedlayer \
 --fees 50stake
 
 }
