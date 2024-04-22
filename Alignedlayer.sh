@@ -117,6 +117,10 @@ MINIMUM_GAS_PRICES="0.0001stake"
 sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.alignedlayer/config/config.toml
 sed -i -e "s|^persistent_peers *=.*|persistent_peers = \"$PERSISTENT_PEERS\"|" $HOME/.alignedlayer/config/config.toml
 sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICES\"|" $HOME/.alignedlayer/config/app.toml
+sed -i -e 's|^chain-id *=.*|chain-id = "alignedlayer"|' $HOME/.alignedlayer/config/client.toml
+sed -i -e 's|^keyring-backend *=.*|keyring-backend = "test"|' $HOME/.alignedlayer/config/client.toml
+sed -i -e 's|^node *=.*|node = "tcp://localhost:5457"|' $HOME/.alignedlayer/config/client.toml
+
 
 # 配置端口
 sed -i -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:5458\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:5457\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:5460\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:5456\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":5466\"%" $HOME/.alignedlayer/config/config.toml
