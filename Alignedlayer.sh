@@ -161,10 +161,10 @@ function add_validator() {
   "min-self-delegation": "1"
 }
 EOF
-alignedlayerd tx checkpointing create-validator ~/validator.json --node "$Alignedlayer_RPC_PORT" \
---chain-id=alignedlayer \
---fees 50stake \
---from=wallet
+alignedlayerd tx staking create-validator $HOME/validator.json \
+--from wallet --chain-id alignedlayer \
+--fees 50stake
+
 }
 
 # 导入钱包
