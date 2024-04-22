@@ -144,9 +144,23 @@ function add_wallet() {
 
 # 创建验证者
 function add_validator() {
-cd $HOME && wget -O setup_validator.sh https://raw.githubusercontent.com/yetanotherco/aligned_layer_tendermint/main/setup_validator.sh && chmod +x setup_validator.sh && bash setup_validator.sh wallet 1050000stake --node $Alignedlayer_RPC_PORT
-
-
+    read -p "请输入你的验证者名称: " validator_name
+    sudo tee ~/validator.json >> /dev/null <<EOF
+{
+  "pubkey": $(alignedlayerd comet show-validator),
+  "amount": "1000000stake",
+  "moniker": "$validator_name",
+  "details": "",
+  "commission-rate": "0.10",
+  "commission-max-rate": "0.20",
+  "commission-max-change-rate": "0.01",
+  "min-self-delegation": "1"
+}
+EOF
+    alignedlayerd tx checkpointing create-validator ~/validator.json --node $Alignedlayer_RPC_PORT \
+    --chain-id=alignedlayer \
+    --fees 50stake \
+    --from=wallet
 }
 
 # 导入钱包
