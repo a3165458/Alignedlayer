@@ -148,10 +148,10 @@ function add_wallet() {
 
 # 创建验证者
 function add_validator() {
-    read -p "请输入你的验证者名称: " validator_name
-    sudo tee ~/validator.json >> /dev/null <<EOF
+  read -p "请输入你的验证者名称: " validator_name
+  sudo tee ~/validator.json > /dev/null <<EOF
 {
-  "pubkey": $(alignedlayerd comet show-validator),
+  "pubkey": "$(alignedlayerd comet show-validator)",
   "amount": "1000000stake",
   "moniker": "$validator_name",
   "details": "",
@@ -161,10 +161,10 @@ function add_validator() {
   "min-self-delegation": "1"
 }
 EOF
-    alignedlayerd tx checkpointing create-validator ~/validator.json --node $Alignedlayer_RPC_PORT \
-    --chain-id=alignedlayer \
-    --fees 50stake \
-    --from=wallet
+alignedlayerd tx checkpointing create-validator ~/validator.json --node "$Alignedlayer_RPC_PORT" \
+--chain-id=alignedlayer \
+--fees 50stake \
+--from=wallet
 }
 
 # 导入钱包
