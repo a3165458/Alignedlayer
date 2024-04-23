@@ -163,13 +163,13 @@ function import_wallet() {
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    alignedlayerd query bank balances "$wallet_address" --node $Alignedlayer_RPC_PORT
+    alignedlayerd query bank balances "$wallet_address"
     
 }
 
 # 查看节点同步状态
 function check_sync_status() {
-    alignedlayerd status --node $Alignedlayer_RPC_PORT | jq .sync_info
+    alignedlayerd status | jq .sync_info
 
     
 }
