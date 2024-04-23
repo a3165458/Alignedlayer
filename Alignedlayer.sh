@@ -169,7 +169,7 @@ function check_balances() {
 
 # 查看节点同步状态
 function check_sync_status() {
-    alignedlayerd status | jq .sync_info
+    alignedlayerd status --node $Alignedlayer_RPC_PORT | jq .sync_info
 
     
 }
@@ -209,7 +209,7 @@ function uninstall_node() {
 function delegate_self_validator() {
 read -p "请输入质押代币数量: " math
 read -p "请输入钱包名称: " wallet_name
-alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake --from $wallet_name --chain-id alignedlayer --fees 50stake --node $node_address
+alignedlayerd tx staking delegate $(alignedlayerd keys show wallet --bech val -a)  ${math}stake --from $wallet_name --chain-id alignedlayer --fees 50stake --node $Alignedlayer_RPC_PORT 
 
 }
 
