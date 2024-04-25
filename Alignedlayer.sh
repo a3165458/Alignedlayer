@@ -207,7 +207,7 @@ function uninstall_node() {
 
 # 给自己地址验证者质押
 function delegate_self_validator() {
-read -p "请输入质押代币数量: " math
+read -p "请输入质押代币数量（100万为1个，如果你想质押1.5个AL，请输入1500000）: " math
 read -p "请输入钱包名称: " wallet_name
 alignedlayerd tx staking delegate $(alignedlayerd keys show $wallet_name --bech val -a)  ${math}stake --from $wallet_name --chain-id alignedlayer --fees 50stake --node $Alignedlayer_RPC_PORT 
 
