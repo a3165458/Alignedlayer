@@ -107,7 +107,7 @@ alignedlayerd init $MONIKER --chain-id alignedlayer
 
 # 从指定的 URL 安装创世文件
 curl -Ls https://raw.githubusercontent.com/a3165458/Alignedlayer/main/genesis.json > $HOME/.alignedlayer/config/genesis.json
-curl -Ls https://raw.githubusercontent.com/a3165458/Alignedlayer/main/addrbook.json > $HOME/.alignedlayer/config/addrbook.json
+wget -O $HOME/.alignedlayer/config/addrbook.json http://95.216.42.217/addrbook.json 
 
 # 设置种子节点和最小 gas 价格
 SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
