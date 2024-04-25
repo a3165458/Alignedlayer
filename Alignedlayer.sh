@@ -130,8 +130,7 @@ source $HOME/.bash_profile
 
 go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
 
-wget -O alignedlayer_snapshot_latest.tar.lz4 http://188.40.51.249/alignedlayer_snapshot_latest.tar.lz4 
-lz4 -d -c ./alignedlayer_snapshot_latest.tar.lz4 | tar -xf - -C $HOME/.alignedlayer
+curl -L https://snap.nodex.one/alignedlayer-testnet/alignedlayer-latest.tar.lz4 | tar -Ilz4 -xf - -C $HOME/.alignedlayer
 mv $HOME/.alignedlayer/priv_validator_state.json.backup $HOME/.alignedlayer/data/priv_validator_state.json
 
 pm2 start alignedlayerd -- start && pm2 save && pm2 startup
