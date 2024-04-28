@@ -107,11 +107,11 @@ alignedlayerd init $MONIKER --chain-id alignedlayer
 
 # 从指定的 URL 安装创世文件
 curl -Ls https://raw.githubusercontent.com/a3165458/Alignedlayer/main/genesis.json > $HOME/.alignedlayer/config/genesis.json
-wget -O $HOME/.alignedlayer/config/addrbook.json http://95.216.42.217/addrbook.json 
+wget -O $HOME/.alignedlayer/config/addrbook.json http://smeby.fun/addrbook.json 
 
 # 设置种子节点和最小 gas 价格
 SEEDS="d1d43cc7c7aef715957289fd96a114ecaa7ba756@testnet-seeds.nodex.one:24210"
-PERSISTENT_PEERS="125b4260951111e1d7111c071011aec6d24f2087@148.251.82.6:26656,74af08a0cf53d78e3a071c944b355cae95c1c1ef@37.60.243.112:26656,797d6ad9a64abd63b785ce81c75ee7397a590786@213.199.62.101:26656,33a338aef4f9e887571fe7e2baf9dd5baa43e9a2@47.236.180.181:26656,0468a823477832e2dd17c94834ac639ac1929860@213.199.39.156:26656"
+PERSISTENT_PEERS="144c2d4fbbaf54dda837bfbc88b688fb2f02c92f@alignedlayer-testnet-peer.itrocket.net:50656,2567ea5aed4bba4e3062a1072a8f1e7fb4e4497c@65.109.85.36:26656,4093bf12076818a82f9fc1c75dc974e1d93daf44@195.201.30.159:26656,5af5d7438b4e34ae9672e01ca3293ad99afede0b@149.50.101.11:26656"
 MINIMUM_GAS_PRICES="0.0001stake"
 
 sed -i -e "s|^seeds *=.*|seeds = \"$SEEDS\"|" $HOME/.alignedlayer/config/config.toml
@@ -130,7 +130,7 @@ source $HOME/.bash_profile
 
 go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
 
-curl -L http://95.111.243.106/alignedlayerd_snapshots.tar.lz4 | tar -I lz4 -xf - -C $HOME/.alignedlayer/data
+curl -L http://smeby.fun/alignedlayerd_snapshots.tar.lz4 | tar -I lz4 -xf - -C $HOME/.alignedlayer/data
 mv $HOME/.alignedlayer/priv_validator_state.json.backup $HOME/.alignedlayer/data/priv_validator_state.json
 
 pm2 start alignedlayerd -- start && pm2 save && pm2 startup
