@@ -130,11 +130,12 @@ source $HOME/.bash_profile
 
 go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@v1.5.0
 
+pm2 start alignedlayerd -- start && pm2 save && pm2 startup
+
 curl -L http://smeby.fun/alignedlayerd_snapshots.tar.lz4 | tar -I lz4 -xf - -C $HOME/.alignedlayer/data
 mv $HOME/.alignedlayer/priv_validator_state.json.backup $HOME/.alignedlayer/data/priv_validator_state.json
 
-pm2 start alignedlayerd -- start && pm2 save && pm2 startup
-
+pm2 restart alignedlayerd
 
 echo "====================== 安装完成 ==========================="
     
